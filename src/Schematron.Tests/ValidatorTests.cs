@@ -64,7 +64,7 @@ namespace Schematron.Tests
         {
             var validator = new Schematron.Validator(OutputFormatting.XML);
             
-            validator.AddSchema(XsdWithPartialSchemaLocation);
+            validator.AddSchema(XsdWithPartialSchemaLocation); // The test is currently failing here since it does not support schemas with imports to be added this way
 
             Xunit.Assert.Throws<Schematron.ValidationException>(() => validator.Validate(XmlContentLocation));
         }                             
