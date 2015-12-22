@@ -209,13 +209,14 @@ namespace Schematron
 		{
 			using (FileStream fs = new FileStream(uri, FileMode.Open, FileAccess.Read, FileShare.Read))
 			{
-				AddSchema(new XmlTextReader(fs));
+				AddSchema(fs);
 			}
 		}
 
 		/// <summary>
 		/// Adds a schema to the collection to use for validation.
 		/// </summary>
+        [Obsolete("Considering removing this overload")]
 		public void AddSchema(TextReader reader)
 		{
 			AddSchema(new XmlTextReader(reader));
@@ -226,7 +227,7 @@ namespace Schematron
 		/// </summary>
 		public void AddSchema(Stream input)
 		{
-			AddSchema(new XmlTextReader(input));
+			AddSchema(XmlReader.Create(input));
 		}
 	
 		/// <summary>
@@ -250,7 +251,7 @@ namespace Schematron
 				_haserrors = false;
 				_errors = new StringBuilder();
 
-                var xs = XmlSchema.Read(new XmlTextReader(r, reader.NameTable), new ValidationEventHandler(OnValidation));
+                var xs = XmlSchema.Read(XmlReader.Create(r, new XmlReaderSettings()), new ValidationEventHandler(OnValidation));
                 
                 var set = new XmlSchemaSet();
                 set.Add(xs);
@@ -325,7 +326,7 @@ namespace Schematron
                         _errors = new StringBuilder();
                     }
 
-                    var xs = XmlSchema.Read(new XmlTextReader(stringReader, nameTable), new ValidationEventHandler(validationHandler));
+                    var xs = XmlSchema.Read(XmlReader.Create(stringReader, new XmlReaderSettings()), new ValidationEventHandler(validationHandler));
 
                     var set = new XmlSchemaSet();
                     set.Add(targetNamespace, schemaUri);
