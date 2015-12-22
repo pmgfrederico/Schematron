@@ -327,6 +327,7 @@ namespace Schematron
                     }
 
                     var xs = XmlSchema.Read(XmlReader.Create(stringReader, new XmlReaderSettings()), new ValidationEventHandler(validationHandler));
+                    xs.SourceUri = schemaUri;
 
                     var set = new XmlSchemaSet();
                     set.Add(targetNamespace, schemaUri);
@@ -499,18 +500,25 @@ namespace Schematron
 
                 var settings = new XmlReaderSettings()
                 {
-                    ValidationType = ValidationType.Schema,                    
+                    ValidationType = ValidationType.Schema,  
+                    ValidationFlags = XmlSchemaValidationFlags.ProcessSchemaLocation | XmlSchemaValidationFlags.ProcessInlineSchema,
                 };                
                 settings.ValidationEventHandler += new ValidationEventHandler(OnValidation);
 
                 foreach (XmlSchema xsd in _xmlschemas.Schemas())
 				{
-					settings.Schemas.Add(xsd);
+                    if (!(string.IsNullOrEmpty(xsd.SourceUri) || string.IsNullOrEmpty(xsd.TargetNamespace)))
+                    {
+                        settings.Schemas.Add(xsd.TargetNamespace, xsd.SourceUri);
+                    }
+                    else
+                    {
+                        settings.Schemas.Add(xsd);
+                    }					
 				}
 
 				var r = XmlReader.Create(reader, settings);
-								
-				
+												
 				IXPathNavigable navdoc;
 				XPathNavigator nav;
 
